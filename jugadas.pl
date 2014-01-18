@@ -1,0 +1,12 @@
+jugada(3,2,4,3),
+jugada(6,5,5,4),
+jugada(4,3,6,5),
+jugada(6,7,5,6),
+jugada(2,1,3,2),
+jugada(6,3,5,4),
+jugada(3,2,4,1),
+jugada(5,4,4,5),
+jugada(2,3,3,2),
+jugada(7,2,6,3),
+jugada(3,6,5,4),
+jugada(3,4,7,2).
