@@ -279,19 +279,19 @@ desplazarUnaCasilla(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     write('movimiento de 1 paso'),nl,!.
 
 
-desplazarDosCasillas(X_intermedia,Y_intermedia,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
+desplazarDosCasillas(Jugador,X_intermedia,Y_intermedia,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     not(casillaOcupada(X_nuevo,Y_nuevo)),
     eliminarFicha(jugador2,X_intermedia,Y_intermedia),
     reubicarFicha(jugador1,peon(X_viejo,Y_viejo),X_nuevo,Y_nuevo),
     write('movimiento de 2 pasos'),nl,!.
     
     
-desplazar(ModuloDiferenciaX,ModuloDiferenciaY,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
+desplazar(Jugador,ModuloDiferenciaX,ModuloDiferenciaY,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     ((ModuloDiferenciaX=:=1),(ModuloDiferenciaY=:=1)),
     desplazarUnaCasilla(X_viejo,Y_viejo,X_nuevo,Y_nuevo),!.
 
    
-desplazar(ModuloDiferenciaX,ModuloDiferenciaY,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
+desplazar(Jugador,ModuloDiferenciaX,ModuloDiferenciaY,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     ((ModuloDiferenciaX=:=2),(ModuloDiferenciaY=:=2)),
     X_intermedia is ((X_viejo+X_nuevo)/2),
     Y_intermedia is ((Y_viejo+Y_nuevo)/2),
@@ -300,11 +300,9 @@ desplazar(ModuloDiferenciaX,ModuloDiferenciaY,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
    
 %el peon no puede caer aca, gracias a la restriccion de modulo en procesarPeon
 %solo puede caer un rey cuyos modulos sean > 2 (gracias al ! en desplazar)
-desplazar(ModuloDiferenciaX,ModuloDiferenciaY,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
+desplazar(Jugador,ModuloDiferenciaX,ModuloDiferenciaY,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     noHayObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo).    
     
-%caso en el que las coordenadas origen y destino coinciden.    
-noHayObstaculo(X,Y,X,Y).    
     
 %caso en e lque el rey sube al noroeste
 noHayObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
@@ -342,7 +340,9 @@ caminoLibre(X_viejo,Y_viejo,X_nuevo,Y_nuevo,OpX,OpY):-
     K =.. [OpX,X_viejo,1],
     NewX is K,
     Z =.. [OpY,Y_viejo,1],
-    NewY is Z,!,
+    NewY is Z,
+    write(NewX),
+    write(NewY),
     not(casillaOcupada(NewX,NewY)),
     caminoLibre(NewX,NewY,X_nuevo,Y_nuevo,OpX,OpY).
     
@@ -362,7 +362,7 @@ procesarPeon(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     ((ModuloDiferenciaX=<2),(ModuloDiferenciaY=<2)),
     %write(ModuloDiferenciaX),
     %write(ModuloDiferenciaY),
-    desplazar(ModuloDiferenciaX,ModuloDiferenciaY,X_viejo,Y_viejo,X_nuevo,Y_nuevo).
+    desplazar(Jugador,ModuloDiferenciaX,ModuloDiferenciaY,X_viejo,Y_viejo,X_nuevo,Y_nuevo).
 
 procesarRey(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     movimientoEsDiagonal(X_viejo,Y_viejo,X_nuevo,Y_nuevo),
@@ -372,11 +372,18 @@ procesarRey(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     ModuloDiferenciaY is abs(DiferenciaY),
     desplazar(ModuloDiferenciaX,ModuloDiferenciaY,X_viejo,Y_viejo,X_nuevo,Y_nuevo).
     
+    
+procesarJugada(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
+    tieneFicha(Jugador,peon(X_viejo,Y_viejo)),
+    procesarPeon(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo),!.
+
+procesarJugada(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
+    tieneFicha(Jugador,rey(X_viejo,Y_viejo)),
+    procesarPeon(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo),!.
 
 jugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     coordenadasValidas(X_viejo,Y_viejo,X_nuevo,Y_nuevo),
-    tieneFicha(jugador1,peon(X_viejo,Y_viejo)),
-    procesarPeon(jugador1,X_viejo,Y_viejo,X_nuevo,Y_nuevo),
+    procesarJugada(jugador1,X_viejo,Y_viejo,X_nuevo,Y_nuevo),
     printTableroActual,
     (not(puedeComer) -> cambiarTurno).
     
