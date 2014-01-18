@@ -388,16 +388,18 @@ doC :- writeln('DoC').
 
 procesarOpcion:-
     writeln('Desea jugar contra la maquina(s/n)?'),
-    read(Opcion),
-    (Opcion = s -> doA,!;
-    (Opcion = n -> doB, retract(vsMaquina),!;
+    read(Opcion), notVar(Opcion),
+    (Opcion = s -> doA, retract(jugador2), retract(maquina),!;
+    (Opcion = n -> doB, retract(jugador2), retract(vsMaquina),!;
     (write('Opcion Invalida.'),nl,
     procesarOpcion))).
 
 % funcion principal
 jugar :-
     assert(jugador1),
+    assert(jugador2),
     assert(vsMaquina),
+    assert(maquina),
     procesarOpcion,
     inicializarFichas,
     writeln('Comenzo el juego'),
@@ -406,7 +408,8 @@ jugar :-
     
 imprimirTurno :-
     jugador1 -> writeln('Juega jugador 1\n'),!;
-    jugador2 -> writeln('Juega jugador 2\n').
+    jugador2 -> writeln('Juega jugador 2\n'),!;
+    maquina -> writeln('Juega la máquina\n').
     
 cambiarTurno :-
     (vsMaquina, jugador1 -> 
