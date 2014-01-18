@@ -425,3 +425,8 @@ cambiarTurno :-
         retract(maquina), assert(jugador1)),!;
     jugador1 -> retract(jugador1), assert(jugador2),!;
     jugador2 -> retract(jugador2), assert(jugador1).
+    
+obtenerJugador(X) :-
+    jugador1 -> X = jugador1,!;
+    jugador2 -> X = jugador2,!;
+    maquina -> X = maquina.
