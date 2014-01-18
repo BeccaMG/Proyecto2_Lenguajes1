@@ -43,6 +43,9 @@ definirTieneFichaFunctor :-
 %     se define dinamicamente el functor de fichas de jugador, con 1 parametro de entrada
     (dynamic tieneFicha/2).
     
+definirComio :-
+    (dynamic comio/0).
+    
 intentona:-
     % en las filas 1,3,6 & 8 se agregran fichas
     % en las columnas 2, 4 6 & 8
@@ -52,10 +55,11 @@ intentona:-
     % en las columnas 1,3 5 & 7
     maplist(agregarFicha,[2,7,0,0],[1,3,5,7]).
     
-inicializarFichas:-
+inicializarFichas :-
 %     definirPeonFunctor,
 %     definirReyFunctor,
     definirTieneFichaFunctor,
+    definirComio,
     % inicializando fichas del jugador uno 
 
 %     agregarFichasColumnas_2_4_6_8(1),
@@ -226,8 +230,7 @@ reubicarFicha(Jugador,FunctorViejo,X_nuevo,Y_nuevo):-
     retract(tieneFicha(Jugador,CopiaFunctorViejo)),
     assert(tieneFicha(Jugador,FunctorNuevo)),!.
     
-    
-    
+   
 % dadas dos coordenadas correspondientes a las filas (X)
 % indica si el movimiento es hacia abajo
 movimientoHaciaAbajo(X_viejo,X_nuevo):-     
@@ -281,49 +284,6 @@ puedeComer(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo) :-
      (tieneFicha(JugadorContrincante,rey(X_intermedia,Y_intermedia)))
     ),
     not(casillaOcupada(X_nuevo,Y_nuevo)).
-
-% desplazarUnaCasilla(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
-%     not(casillaOcupada(X_nuevo,Y_nuevo)),
-%     reubicarFicha(jugador1,peon(X_viejo,Y_viejo),X_nuevo,Y_nuevo),
-%     write('movimiento de 1 paso'),nl,!.
-% 
-
-% desplazarDosCasillas(Jugador,X_intermedia,Y_intermedia,X_viejo,Y_viejo,X_nuevo,
-% Y_nuevo):-
-%     not(casillaOcupada(X_nuevo,Y_nuevo)),
-%     eliminarFicha(jugador2,X_intermedia,Y_intermedia),
-%     reubicarFicha(jugador1,peon(X_viejo,Y_viejo),X_nuevo,Y_nuevo),
-%     write('movimiento de 2 pasos'),nl,!.
-
-
-%desplazar(Jugador,ModuloDiferenciaX,ModuloDiferenciaY,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
-%    ((ModuloDiferenciaX=:=1),(ModuloDiferenciaY=:=1)),
-%    desplazarUnaCasilla(X_viejo,Y_viejo,X_nuevo,Y_nuevo),!.
-
-   
-%desplazar(Jugador,ModuloDiferenciaX,ModuloDiferenciaY,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
-%    ((ModuloDiferenciaX=:=2),(ModuloDiferenciaY=:=2)),
-%    X_intermedia is ((X_viejo+X_nuevo)/2),
-%    Y_intermedia is ((Y_viejo+Y_nuevo)/2),
-%    tieneFicha(jugador2,peon(X_intermedia,Y_intermedia)),
-%    desplazarDosCasillas(X_intermedia,Y_intermedia,X_viejo,Y_viejo,X_nuevo,Y_nuevo),!.  
-   
-%el peon no puede caer aca, gracias a la restriccion de modulo en procesarPeon
-%solo puede caer un rey cuyos modulos sean > 2 (gracias al ! en desplazar)
-%desplazar(Jugador,ModuloDiferenciaX,ModuloDiferenciaY,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
-%    noHayObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo).    
-    
-
-%coordY[-1,-2,-3,-4,-5,-6,-7,-8,]
-%coordX[1,2,3,4,5,6,7,8]
-%min(-Xorigen,-Xdestino,Ymin)
-%max(-Xorigen,-Xdestino.Ymax)
-%coordY =\= -Xorigen
-%coordX =\= Yorgein
-%m = (-Xdestino-(-Xorigen))/(Ydestino - Yorigen)
-%    b = -Xorigen - (m.Yorigen)
-%coordY = m.coordX +b
-%tieneficha(-coordY,coordX)
 
 %caso en e lque el rey sube al noroeste
 noHayObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
@@ -407,6 +367,7 @@ puedeDesplazarse(peon(X_viejo,Y_viejo),X_nuevo,Y_nuevo,2,2):-
     obtenerContrincante(Jugador,JugadorContrincante),
     obtenerIntermedias(X_viejo,Y_viejo,X_nuevo,Y_nuevo,X_intermedia,Y_intermedia),
     eliminarFicha(JugadorContrincante,X_intermedia,Y_intermedia),
+    assert(comio),
     reubicarFicha(Jugador,peon(X_viejo,Y_viejo),X_nuevo,Y_nuevo),
     write('movimiento de 2 pasos'),nl,!.
     
@@ -469,30 +430,25 @@ procesarJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     desplazar(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo).
 
 
-jugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
+jugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo) :-
     coordenadasValidas(X_viejo,Y_viejo,X_nuevo,Y_nuevo),
     procesarJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo),
     printTableroActual,
     obtenerJugador(Jugador),
-    ((ganador(Jugador) -> write('\n¡Ha ganado '),write(Jugador), write('!\n\n'),
-       halt),!;
-    (not(puedeComer(X_nuevo,Y_nuevo)), not(ganador(Jugador)) -> cambiarTurno)),
+    ( (ganador(Jugador), write('\n¡Ha ganado '), write(Jugador), write('!\n\n'),
+       halt); ! ),
+    ( (comio, puedeComer(X_nuevo,Y_nuevo), retract(comio), !) ;
+     (cambiarTurno, !) ),
     imprimirTurno.
-    
-jugada(_,_,_,_) :- 
-    write('Movimiento Invalido').
 
-doA :- writeln('DoA').
-doB :- writeln('DoB').
-doC :- writeln('DoC').
 
 procesarOpcion:-
     retract(jugador2),
     writeln('Desea jugar contra la maquina(s/n)?'),
     read(Opcion), not(var(Opcion)),
-    (Opcion = s -> doA, !;
-    (Opcion = n -> doB, retract(vsMaquina),!;
-    (write('Opcion Invalida.'),nl,
+    (Opcion = s -> !;
+    (Opcion = n -> retract(vsMaquina), !;
+    (write('Opcion Invalida.'), nl,
     procesarOpcion))).
 
 % funcion principal
