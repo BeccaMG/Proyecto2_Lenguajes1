@@ -384,4 +384,7 @@ jugar :-
 imprimirTurno :-
     jugador1 -> writeln('Juega jugador 1\n'),!;
     jugador2 -> writeln('Juega jugador 2\n').
+    
+cambiarTurno(Jugador) :-
+    
 
