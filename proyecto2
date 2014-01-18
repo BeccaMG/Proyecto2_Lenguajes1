@@ -385,7 +385,7 @@ procesarJugada(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
 
 jugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     coordenadasValidas(X_viejo,Y_viejo,X_nuevo,Y_nuevo),
-    procesarJugada(jugador1),
+    procesarJugada(jugador1,X_viejo,Y_viejo,X_nuevo,Y_nuevo),
     printTableroActual,!.
     
 jugada(_,_,_,_):- write('Movimiento Invalido').
