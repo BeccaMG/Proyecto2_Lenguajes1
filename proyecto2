@@ -374,11 +374,18 @@ procesarRey(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     ModuloDiferenciaY is abs(DiferenciaY),
     desplazar(ModuloDiferenciaX,ModuloDiferenciaY,X_viejo,Y_viejo,X_nuevo,Y_nuevo).
     
+    
+procesarJugada(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
+    tieneFicha(Jugador,peon(X_viejo,Y_viejo)),
+    procesarPeon(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo),!.
+
+procesarJugada(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
+    tieneFicha(Jugador,rey(X_viejo,Y_viejo)),
+    procesarPeon(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo),!.
 
 jugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     coordenadasValidas(X_viejo,Y_viejo,X_nuevo,Y_nuevo),
-    tieneFicha(jugador1,peon(X_viejo,Y_viejo)),
-    procesarPeon(jugador1,X_viejo,Y_viejo,X_nuevo,Y_nuevo),
+    procesarJugada(jugador1),
     printTableroActual,!.
     
 jugada(_,_,_,_):- write('Movimiento Invalido').
