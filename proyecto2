@@ -1,5 +1,3 @@
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%             INTENTONA                 %%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -338,7 +336,7 @@ noHayObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     caminoLibre(X_viejo,Y_viejo,X_nuevo,Y_nuevo,+,-),!.
     
 
-caminoLibre(X,Y,X,Y,_,_),!. 
+caminoLibre(X,Y,X,Y,_,_). 
 
 caminoLibre(X_viejo,Y_viejo,X_nuevo,Y_nuevo,OpX,OpY):-
     K =.. [OpX,X_viejo,1],
@@ -379,7 +377,8 @@ jugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     coordenadasValidas(X_viejo,Y_viejo,X_nuevo,Y_nuevo),
     tieneFicha(jugador1,peon(X_viejo,Y_viejo)),
     procesarPeon(jugador1,X_viejo,Y_viejo,X_nuevo,Y_nuevo),
-    printTableroActual,!.
+    printTableroActual,
+    (not(puedeComer) -> cambiarTurno).
     
 jugada(_,_,_,_):- write('Movimiento Invalido').
 
@@ -391,14 +390,27 @@ procesarOpcion:-
     writeln('Desea jugar contra la maquina(s/n)?'),
     read(Opcion),
     (Opcion = s -> doA,!;
-    (Opcion = n -> doB,!;
+    (Opcion = n -> doB, retract(vsMaquina),!;
     (write('Opcion Invalida.'),nl,
     procesarOpcion))).
 
 % funcion principal
-jugar:-
+jugar :-
+    assert(jugador1),
+    assert(vsMaquina),
     procesarOpcion,
     inicializarFichas,
     writeln('Comenzo el juego'),
-    printTableroActual.
-
+    printTableroActual,
+    imprimirTurno.
+    
+imprimirTurno :-
+    jugador1 -> writeln('Juega jugador 1\n'),!;
+    jugador2 -> writeln('Juega jugador 2\n').
+    
+cambiarTurno :-
+    (vsMaquina, jugador1 -> 
+        retract(jugador1), assert(maquina),!;
+        retract(maquina), assert(jugador1)),!;
+    jugador1 -> retract(jugador1), assert(jugador2),!;
+    jugador2 -> retract(jugador2), assert(jugador1).
