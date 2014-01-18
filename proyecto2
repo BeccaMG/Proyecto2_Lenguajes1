@@ -395,9 +395,10 @@ doC :- writeln('DoC').
 
 procesarOpcion:-
     writeln('Desea jugar contra la maquina(s/n)?'),
-    read(Opcion), notVar(Opcion),
+    read(Opcion), not(var(Opcion)),
     (Opcion = s -> doA, retract(jugador2), retract(maquina),!;
-    (Opcion = n -> doB, retract(jugador2), retract(vsMaquina),!;
+    (Opcion = n -> doB, retract(jugador2), retract(vsMaquina),
+                    retract(maquina),!;
     (write('Opcion Invalida.'),nl,
     procesarOpcion))).
 
