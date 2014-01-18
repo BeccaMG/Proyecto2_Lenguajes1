@@ -437,7 +437,7 @@ jugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo) :-
     obtenerJugador(Jugador),
     ( (ganador(Jugador), write('\n¡Ha ganado '), write(Jugador), write('!\n\n'),
        halt); ! ),
-    ( (comio, puedeComer(X_nuevo,Y_nuevo), retract(comio), !) ;
+    ( (comio, retract(comio), puedeComer(X_nuevo,Y_nuevo), !) ;
      (cambiarTurno, !) ),
     imprimirTurno.
 
@@ -482,19 +482,23 @@ ganador(Jugador) :-
 
 puedeComer(X,Y) :-
     obtenerJugador(Jugador),
-    (tieneFicha(Jugador, peon(X,Y)), puedeComer(peon(X,Y))),!;
-    (tieneFicha(Jugador, rey(X,Y)), puedeComer(rey(X,Y))).
+    ((tieneFicha(Jugador, peon(X,Y)), puedeComer(peon(X,Y)), !);
+    (tieneFicha(Jugador, rey(X,Y)), puedeComer(rey(X,Y)))).
     
 puedeComer(peon(X,Y)) :-
     jugador1, 
     X1 is X+2,
-    puedeComer(jugador1,X,Y,X1,_).
+    puedeComer(jugador1,X,Y,X1,Y1),
+    abs(Y1-Y) =:= 2.
        
 puedeComer(peon(X,Y)) :-
     jugador2, 
     X1 is X-2,
-    puedeComer(jugador2,X,Y,X1,_).
+    puedeComer(jugador2,X,Y,X1,Y1),
+    abs(Y1-Y) =:= 2.
     
 puedeComer(rey(X,Y)) :-
-    obtenerJugador(Jugador), 
-    puedeComer(Jugador,X,Y,_,_).
+    obtenerJugador(Jugador),
+    puedeComer(Jugador,X,Y,X1,Y1),
+    abs(X1-X) =:= 2,
+    abs(Y1-Y) =:= 2.
