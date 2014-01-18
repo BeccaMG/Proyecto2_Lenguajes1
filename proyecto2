@@ -104,22 +104,22 @@ printCasilla2(Fila,Columna):-
     write('|  '),
     % caso en el que la ficha existe, es un peon, le pertenece al jugador 1
     (tieneFicha(jugador1,peon(Fila,Columna))->
-        write('*'),
+        write('B'),
         write('  |'),!
     );
     % caso en el que la ficha existe, es un rey, le pertenece al jugador 1
     (tieneFicha(jugador1,rey(Fila,Columna))->
-        write('**'),
+        write('BB'),
         write(' |'),!
     );
     % caso en el que la ficha existe, es un peon, le pertenece al jugador 2
      (tieneFicha(jugador2,peon(Fila,Columna))->
-        write('B'),
+        write('*'),
         write('  |'),!
     );
     % caso en el que la ficha existe, es un rey, le pertenece al jugador 2
      (tieneFicha(jugador2,rey(Fila,Columna))->
-        write('BB'),
+        write('**j'),
         write(' |'),!
     );
     write('   |').
@@ -385,7 +385,7 @@ jugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     coordenadasValidas(X_viejo,Y_viejo,X_nuevo,Y_nuevo),
     procesarJugada(jugador1,X_viejo,Y_viejo,X_nuevo,Y_nuevo),
     printTableroActual,
-    (not(puedeComer) -> cambiarTurno).
+    (not(puedeComer(X_nuevo,Y_nuevo)), not(ganador) -> cambiarTurno).
     
 jugada(_,_,_,_):- write('Movimiento Invalido').
 
@@ -430,3 +430,7 @@ obtenerJugador(X) :-
     jugador1 -> X = jugador1,!;
     jugador2 -> X = jugador2,!;
     maquina -> X = maquina.
+    
+ganador.
+
+puedeComer(peon(X,Y)) :- jugador1.
