@@ -399,11 +399,6 @@ puedeDesplazarse(peon(X_viejo,Y_viejo),X_nuevo,Y_nuevo,2,2):-
     reubicarFicha(Jugador,peon(X_viejo,Y_viejo),X_nuevo,Y_nuevo),
     write('movimiento de 2 pasos'),nl,!.
     
-puedeDesplazarse(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo,_,_):-
-    noHayObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo),
-    obtenerJugador(Jugador),
-    reubicarFicha(Jugador,rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo).
-    
 puedeDesplazarse(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo,2,2):-
     obtenerJugador(Jugador),
     puedeComer(Jugador,rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo),
@@ -411,7 +406,13 @@ puedeDesplazarse(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo,2,2):-
     obtenerIntermedias(X_viejo,Y_viejo,X_nuevo,Y_nuevo,X_intermedia,Y_intermedia),
     eliminarFicha(JugadorContrincante,X_intermedia,Y_intermedia),
     reubicarFicha(Jugador,rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo),
-    write('movimiento de 2 pasos'),nl,!. 
+    write('movimiento de 2 pasos'),nl.     
+    
+puedeDesplazarse(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo,_,_):-
+    noHayObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo),
+    obtenerJugador(Jugador),
+    reubicarFicha(Jugador,rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo).
+    
     
 movimientoValido(jugador1,peon,X_viejo,_,X_nuevo,_):-
     movimientoHaciaAbajo(X_viejo,X_nuevo).
