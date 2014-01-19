@@ -208,7 +208,17 @@ eliminarFicha(Jugador,X,Y):-
 % parametro, por un rey.
 cambiarPeonPorRey(Jugador,X,Y):-
     retract(tieneFicha(Jugador,peon(X,Y))),
-    assert(tieneFicha(Jugador,rey(X,Y))),!.
+    assert(tieneFicha(Jugador,rey(X,Y))),!.    
+    
+reubicarFicha(jugador1,peon(X_viejo,Y_viejo),8,Y_nuevo):-    
+    retract(tieneFicha(jugador1,peon(X_viejo,Y_viejo))),
+    assert(tieneFicha(jugador1,peon(8,Y_nuevo))),
+    cambiarPeonPorRey(jugador1,8,Y_nuevo),!.
+    
+reubicarFicha(jugador2,peon(X_viejo,Y_viejo),1,Y_nuevo):-    
+    retract(tieneFicha(jugador2,peon(X_viejo,Y_viejo))),
+    assert(tieneFicha(jugador2,peon(1,Y_nuevo))),
+    cambiarPeonPorRey(jugador2,1,Y_nuevo),!.
     
 % reubica la ficha dada en la casilla correspondiente a las coordenadas 
 % X_vieja,Y_vieja a la casilla destino denotada por X_nuevo, Y_nuevo
@@ -225,7 +235,7 @@ reubicarFicha(Jugador,FunctorViejo,X_nuevo,Y_nuevo):-
     % se reconstruye la estructura, empleando el functor de entrada
     % en conjunto con los nuevos atomos (coordenadas de destino)
     FunctorNuevo =.. [FunctorRecuperado,X_nuevo,Y_nuevo],
-    
+        
     % actualizacion de la base del conocimiento
     retract(tieneFicha(Jugador,CopiaFunctorViejo)),
     assert(tieneFicha(Jugador,FunctorNuevo)),!.
@@ -289,7 +299,7 @@ puedeComer(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo) :-
 noHayObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     (X_viejo>X_nuevo),
     (Y_viejo>Y_nuevo),
-    write('noroeste'),
+    %write('noroeste'),
     caminoLibre(X_viejo,Y_viejo,X_nuevo,Y_nuevo,-,-),!.
  
     
@@ -297,21 +307,21 @@ noHayObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
 noHayObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     (X_viejo>X_nuevo),
     (Y_viejo<Y_nuevo),
-    write('noreste'),
+    %write('noreste'),
     caminoLibre(X_viejo,Y_viejo,X_nuevo,Y_nuevo,-,+),!.
     
 %caso en el que el rey baja al sureste
 noHayObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     (X_viejo<X_nuevo),
     (Y_viejo<Y_nuevo),
-    write('sureste'),
+   % write('sureste'),
     caminoLibre(X_viejo,Y_viejo,X_nuevo,Y_nuevo,+,+),!.    
     
 %caso en el que el rey baja al suroeste
 noHayObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     (X_viejo<X_nuevo),
     (Y_viejo>Y_nuevo),
-    write('suroeste'),
+    %write('suroeste'),
     caminoLibre(X_viejo,Y_viejo,X_nuevo,Y_nuevo,+,-),!.
     
 caminoLibre(X,Y,X,Y,_,_). 
@@ -321,8 +331,8 @@ caminoLibre(X_viejo,Y_viejo,X_nuevo,Y_nuevo,OpX,OpY):-
     NewX is K,
     Z =.. [OpY,Y_viejo,1],
     NewY is Z,
-    write(NewX),
-    write(NewY),
+  %  write(NewX),
+   %S write(NewY),
     not(casillaOcupada(NewX,NewY)),
     caminoLibre(NewX,NewY,X_nuevo,Y_nuevo,OpX,OpY).
         
