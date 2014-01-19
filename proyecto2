@@ -119,7 +119,7 @@ printCasilla2(Fila,Columna):-
     );
     % caso en el que la ficha existe, es un rey, le pertenece al jugador 2
      (tieneFicha(jugador2,rey(Fila,Columna))->
-        write('**j'),
+        write('**'),
         write(' |'),!
     );
     write('   |').
@@ -286,24 +286,34 @@ desplazarDosCasillas(Jugador,X_intermedia,Y_intermedia,X_viejo,Y_viejo,X_nuevo,Y
     write('movimiento de 2 pasos'),nl,!.
     
     
-desplazar(Jugador,ModuloDiferenciaX,ModuloDiferenciaY,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
-    ((ModuloDiferenciaX=:=1),(ModuloDiferenciaY=:=1)),
-    desplazarUnaCasilla(X_viejo,Y_viejo,X_nuevo,Y_nuevo),!.
+%desplazar(Jugador,ModuloDiferenciaX,ModuloDiferenciaY,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
+%    ((ModuloDiferenciaX=:=1),(ModuloDiferenciaY=:=1)),
+%    desplazarUnaCasilla(X_viejo,Y_viejo,X_nuevo,Y_nuevo),!.
 
    
-desplazar(Jugador,ModuloDiferenciaX,ModuloDiferenciaY,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
-    ((ModuloDiferenciaX=:=2),(ModuloDiferenciaY=:=2)),
-    X_intermedia is ((X_viejo+X_nuevo)/2),
-    Y_intermedia is ((Y_viejo+Y_nuevo)/2),
-    tieneFicha(jugador2,peon(X_intermedia,Y_intermedia)),
-    desplazarDosCasillas(X_intermedia,Y_intermedia,X_viejo,Y_viejo,X_nuevo,Y_nuevo),!.  
+%desplazar(Jugador,ModuloDiferenciaX,ModuloDiferenciaY,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
+%    ((ModuloDiferenciaX=:=2),(ModuloDiferenciaY=:=2)),
+%    X_intermedia is ((X_viejo+X_nuevo)/2),
+%    Y_intermedia is ((Y_viejo+Y_nuevo)/2),
+%    tieneFicha(jugador2,peon(X_intermedia,Y_intermedia)),
+%    desplazarDosCasillas(X_intermedia,Y_intermedia,X_viejo,Y_viejo,X_nuevo,Y_nuevo),!.  
    
 %el peon no puede caer aca, gracias a la restriccion de modulo en procesarPeon
 %solo puede caer un rey cuyos modulos sean > 2 (gracias al ! en desplazar)
-desplazar(Jugador,ModuloDiferenciaX,ModuloDiferenciaY,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
-    noHayObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo).    
+%desplazar(Jugador,ModuloDiferenciaX,ModuloDiferenciaY,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
+%    noHayObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo).    
     
-    
+
+%coordY[-1,-2,-3,-4,-5,-6,-7,-8,]
+%coordX[1,2,3,4,5,6,7,8]
+%min(-Xorigen,-Xdestino,Ymin)
+%max(-Xorigen,-Xdestino.Ymax)
+%coordY =\= -Xorigen
+%coordX =\= Yorgein
+%m = (-Xdestino-(-Xorigen))/(Ydestino - Yorigen)
+%    b = -Xorigen - (m.Yorigen)
+%coordY = m.coordX +b
+%tieneficha(-coordY,coordX)
 %caso en e lque el rey sube al noroeste
 noHayObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     (X_viejo>X_nuevo),
@@ -330,10 +340,9 @@ noHayObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
 noHayObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     (X_viejo<X_nuevo),
     (Y_viejo>Y_nuevo),
-    write('suroeste');
+    write('suroeste'),
     caminoLibre(X_viejo,Y_viejo,X_nuevo,Y_nuevo,+,-),!.
     
-
 caminoLibre(X,Y,X,Y,_,_). 
 
 caminoLibre(X_viejo,Y_viejo,X_nuevo,Y_nuevo,OpX,OpY):-
@@ -345,47 +354,114 @@ caminoLibre(X_viejo,Y_viejo,X_nuevo,Y_nuevo,OpX,OpY):-
     write(NewY),
     not(casillaOcupada(NewX,NewY)),
     caminoLibre(NewX,NewY,X_nuevo,Y_nuevo,OpX,OpY).
+        
+%procesarPeon(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
+%    (((Jugador=jugador1)  ->
+%      movimientoHaciaAbajo(X_viejo,X_nuevo)
+%    );
+%    ((Jugador=jugador2)  ->
+%      movimiendoHaciArriba(X_viejo,X_nuevo)
+%    )),
+%    DiferenciaX is X_viejo-X_nuevo,
+%    DiferenciaY is Y_viejo-Y_nuevo,
+%    ModuloDiferenciaX is abs(DiferenciaX),
+%    ModuloDiferenciaY is abs(DiferenciaY),
+%    %el peon puede moverse un maximo de dos casillas 
+%    ((ModuloDiferenciaX=<2),(ModuloDiferenciaY=<2)),
+%    %write(ModuloDiferenciaX),
+%    %write(ModuloDiferenciaY),
+%    desplazar(Jugador,ModuloDiferenciaX,ModuloDiferenciaY,X_viejo,Y_viejo,X_nuevo,Y_nuevo).
+
+%procesarRey(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
+%    movimientoEsDiagonal(X_viejo,Y_viejo,X_nuevo,Y_nuevo),
+%    DiferenciaX is X_viejo-X_nuevo,
+%    DiferenciaY is Y_viejo-Y_nuevo,
+%    ModuloDiferenciaX is abs(DiferenciaX),
+%    ModuloDiferenciaY is abs(DiferenciaY),
+%    desplazar(ModuloDiferenciaX,ModuloDiferenciaY,X_viejo,Y_viejo,X_nuevo,Y_nuevo).
+
+obtenerIntermedias(X_viejo,Y_viejo,X_nuevo,Y_nuevo,X_intermedia,Y_intermedia):-
+    X_intermedia is ((X_viejo+X_nuevo)/2),
+    Y_intermedia is ((Y_viejo+Y_nuevo)/2).
+
+puedeDesplazarse(peon(X_viejo,Y_viejo),X_nuevo,Y_nuevo,1,1):-
+    obtenerJugador(Jugador),
+    not(casillaOcupada(X_nuevo,Y_nuevo)),
+    reubicarFicha(Jugador,peon(X_viejo,Y_viejo),X_nuevo,Y_nuevo),
+    write('movimiento de 1 paso'),nl,!.
+
+puedeDesplazarse(peon(X_viejo,Y_viejo),X_nuevo,Y_nuevo,2,2):-
+    obtenerJugador(Jugador),
+    puedeComer(Jugador,peon(X_viejo,Y_viejo),X_nuevo,Y_nuevo),
+    obtenerContrincante(Jugador,JugadorContrincante),
+    obtenerIntermedias(X_viejo,Y_viejo,X_nuevo,Y_nuevo,X_intermedia,Y_intermedia),
+    eliminarFicha(JugadorContrincante,X_intermedia,Y_intermedia),
+    reubicarFicha(Jugador,peon(X_viejo,Y_viejo),X_nuevo,Y_nuevo),
+    write('movimiento de 2 pasos'),nl,!.
     
+puedeDesplazarse(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo,_,_):-
+    noHayObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo),
+    obtenerJugador(Jugador),
+    reubicarFicha(Jugador,rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo).
     
-procesarPeon(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
-    (((Jugador=jugador1)  ->
-      movimientoHaciaAbajo(X_viejo,X_nuevo)
-    );
-    ((Jugador=jugador2)  ->
-      movimiendoHaciArriba(X_viejo,X_nuevo)
-    )),
+puedeDesplazarse(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo,2,2):-
+    obtenerJugador(Jugador),
+    puedeComer(Jugador,rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo),
+    obtenerContrincante(Jugador,JugadorContrincante),
+    obtenerIntermedias(X_viejo,Y_viejo,X_nuevo,Y_nuevo,X_intermedia,Y_intermedia),
+    eliminarFicha(JugadorContrincante,X_intermedia,Y_intermedia),
+    reubicarFicha(Jugador,rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo),
+    write('movimiento de 2 pasos'),nl,!. 
+    
+movimientoValido(jugador1,peon,X_viejo,_,X_nuevo,_):-
+    movimientoHaciaAbajo(X_viejo,X_nuevo).
+
+movimientoValido(jugador2,peon,X_viejo,_,X_nuevo,_):-
+    movimientoHaciaArriba(X_viejo,X_nuevo).
+    
+movimientoValido(_,rey,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
+    movimientoEsDiagonal(X_viejo,Y_viejo,X_nuevo,Y_nuevo).    
+    
+calcularDiferencia(X_viejo,Y_viejo,X_nuevo,Y_nuevo,DiferenciaX,DiferenciaY):-
     DiferenciaX is X_viejo-X_nuevo,
-    DiferenciaY is Y_viejo-Y_nuevo,
+    DiferenciaY is Y_viejo-Y_nuevo.
+
+desplazar(peon(X_viejo,Y_viejo),X_nuevo,Y_nuevo):-
+    obtenerJugador(Jugador),
+    movimientoValido(Jugador,peon,X_viejo,Y_viejo,X_nuevo,Y_nuevo),
+    calcularDiferencia(X_viejo,Y_viejo,X_nuevo,Y_nuevo,DiferenciaX,DiferenciaY),
     ModuloDiferenciaX is abs(DiferenciaX),
     ModuloDiferenciaY is abs(DiferenciaY),
-    %el peon puede moverse un maximo de dos casillas 
-    ((ModuloDiferenciaX=<2),(ModuloDiferenciaY=<2)),
     %write(ModuloDiferenciaX),
-    %write(ModuloDiferenciaY),
-    desplazar(Jugador,ModuloDiferenciaX,ModuloDiferenciaY,X_viejo,Y_viejo,X_nuevo,Y_nuevo).
-
-procesarRey(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
-    movimientoEsDiagonal(X_viejo,Y_viejo,X_nuevo,Y_nuevo),
-    DiferenciaX is X_viejo-X_nuevo,
-    DiferenciaY is Y_viejo-Y_nuevo,
+    %write(ModuloDiferenciaY).
+    puedeDesplazarse(peon(X_viejo,Y_viejo),X_nuevo,Y_nuevo,ModuloDiferenciaX,ModuloDiferenciaY).
+    
+desplazar(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo):-
+    obtenerJugador(Jugador),
+    movimientoValido(Jugador,rey,X_viejo,Y_viejo,X_nuevo,Y_nuevo),
+    calcularDiferencia(X_viejo,Y_viejo,X_nuevo,Y_nuevo,DiferenciaX,DiferenciaY),
     ModuloDiferenciaX is abs(DiferenciaX),
     ModuloDiferenciaY is abs(DiferenciaY),
-    desplazar(ModuloDiferenciaX,ModuloDiferenciaY,X_viejo,Y_viejo,X_nuevo,Y_nuevo).
+    puedeDesplazarse(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo,ModuloDiferenciaX,ModuloDiferenciaY).
     
-    
-procesarJugada(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
+procesarJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
+    obtenerJugador(Jugador),
     tieneFicha(Jugador,peon(X_viejo,Y_viejo)),
-    procesarPeon(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo),!.
+    %procesarPeon(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo),!.
+    desplazar(peon(X_viejo,Y_viejo),X_nuevo,Y_nuevo).
 
-procesarJugada(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
+procesarJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
+    obtenerJugador(Jugador),
     tieneFicha(Jugador,rey(X_viejo,Y_viejo)),
-    procesarPeon(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo),!.
+    %procesarPeon(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo),!.
+    desplazar(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo).
+
 
 jugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     coordenadasValidas(X_viejo,Y_viejo,X_nuevo,Y_nuevo),
-    procesarJugada(jugador1,X_viejo,Y_viejo,X_nuevo,Y_nuevo),
-    printTableroActual,
-    (not(puedeComer(X_nuevo,Y_nuevo)), not(ganador) -> cambiarTurno).
+    procesarJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo),
+    printTableroActual,!.
+    %(not(puedeComer(X_nuevo,Y_nuevo)), not(ganador) -> cambiarTurno).
     
 jugada(_,_,_,_):- write('Movimiento Invalido').
 
