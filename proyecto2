@@ -446,25 +446,9 @@ primerObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo,XResult1,YResult2,OpX,OpY):-
     NewX is K,
     Z =.. [OpY,Y_viejo,1],
     NewY is Z,
-  %  write(NewX),
-   %S write(NewY),
+   %  write(NewX),
+   %  write(NewY),
     primerObstaculo(NewX,NewY,X_nuevo,Y_nuevo,XResult1,YResult2,OpX,OpY).
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     
 movimientoValido(jugador1,peon,X_viejo,_,X_nuevo,_):-
@@ -497,6 +481,14 @@ desplazar(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo):-
     ModuloDiferenciaX is abs(DiferenciaX),
     ModuloDiferenciaY is abs(DiferenciaY),
     puedeDesplazarse(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo,ModuloDiferenciaX,ModuloDiferenciaY).
+    
+%obtiene una jugada valida para la maquina
+obtenerJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-    
+    member(X_viejo,[1,2,3,4,5,6,7,8]), 
+    member(Y_viejo,[1,2,3,4,5,6,7,8]),
+    member(X_nuevo,[1,2,3,4,5,6,7,8]), 
+    member(Y_nuevo,[1,2,3,4,5,6,7,8]),
+    procesarJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo).
     
 procesarJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     obtenerJugador(Jugador),
