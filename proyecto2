@@ -399,25 +399,25 @@ puedeComer(Jugador,rey,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
 obtenerPrimerObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo,XResult1,YResult2):-
     (X_viejo>X_nuevo),
     (Y_viejo>Y_nuevo),
-    write('noroeste'),
+    %write('noroeste'),
     primerObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo,XResult1,YResult2,-,-),!.
 
 obtenerPrimerObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo,XResult1,YResult2):-
     (X_viejo>X_nuevo),
     (Y_viejo<Y_nuevo),
-    write('noreste'),
+    %write('noreste'),
     primerObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo,XResult1,YResult2,-,+),!.
 
 obtenerPrimerObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo,XResult1,YResult2):-
     (X_viejo<X_nuevo),
     (Y_viejo<Y_nuevo),
-    write('sureste'),
+    %write('sureste'),
     primerObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo,XResult1,YResult2,+,+),!.
 
 obtenerPrimerObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo,XResult1,YResult2):-
     (X_viejo<X_nuevo),
     (Y_viejo>Y_nuevo),
-    write('suroeste'),
+    %write('suroeste'),
     primerObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo,XResult1,YResult2,+,-),!.
 
 primerObstaculo(X,Y,X,Y,_,_,_,_):-fail.
