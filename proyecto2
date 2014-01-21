@@ -488,7 +488,7 @@ obtenerJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     member(Y_viejo,[1,2,3,4,5,6,7,8]),
     member(X_nuevo,[1,2,3,4,5,6,7,8]), 
     member(Y_nuevo,[1,2,3,4,5,6,7,8]),
-    procesarJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo).
+    procesarJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo),!.
     
 procesarJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     obtenerJugador(Jugador),
@@ -508,9 +508,15 @@ jugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo) :-
     ((jugadaConsecutiva(X_viejo,Y_viejo,X_nuevo,Y_nuevo), !);
     (jugadaNormal(X_viejo,Y_viejo,X_nuevo,Y_nuevo))).
   
+turnoMaquina:-
+    obtenerJugador(Jugador),
+    (Jugador=jugador2),
+    (vsMaquina).
+  
 jugadaNormal(X_viejo,Y_viejo,X_nuevo,Y_nuevo) :-
     not(comer(_,_)),
-    procesarJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo),
+    %solo se procesa una jugada efectuada por el jugador1
+    ( (not(turnoMaquina),procesarJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo));!),
     printTableroActual,
     obtenerJugador(Jugador),
     ( (ganador(Jugador), write('\n¡Ha ganado '), write(Jugador), write('!\n\n'),
@@ -518,13 +524,17 @@ jugadaNormal(X_viejo,Y_viejo,X_nuevo,Y_nuevo) :-
     ( (comio, retract(comio), puedeComer(X_nuevo,Y_nuevo,_,_),
         assert(comer(X_nuevo,Y_nuevo)), !);
       (cambiarTurno, !) ),
-    imprimirTurno.
+    imprimirTurno,
+    %caso en el que el turno es de la maquina, se computa la primera jugada valida
+    ( (turnoMaquina,obtenerJugada(X_viejoM,Y_viejoM,X_nuevoM,Y_nuevoM),
+     jugada(X_viejoM,Y_viejoM,X_nuevoM,Y_nuevoM));!),!.
     
 jugadaConsecutiva(X_viejo,Y_viejo,X_nuevo,Y_nuevo) :-
     comer(X_viejo,Y_viejo),
     retract(comer(X_viejo,Y_viejo)),
     puedeComer(X_viejo,Y_viejo,X_nuevo,Y_nuevo),
-    procesarJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo),
+    %solo se procesa una jugada efectuada por el jugador1
+    ( (not(turnoMaquina),procesarJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo));!),
     printTableroActual,
     obtenerJugador(Jugador),
     ( (ganador(Jugador), write('\n¡Ha ganado '), write(Jugador), write('!\n\n'),
@@ -532,7 +542,10 @@ jugadaConsecutiva(X_viejo,Y_viejo,X_nuevo,Y_nuevo) :-
     ( (comio, retract(comio), puedeComer(X_nuevo,Y_nuevo,_,_),
         assert(comer(X_nuevo,Y_nuevo)), !);
       (cambiarTurno, !) ),
-    imprimirTurno.
+    imprimirTurno,
+    %caso en el que el turno es de la maquina, se computa la primera jugada valida
+    ( (turnoMaquina,obtenerJugada(X_viejoM,Y_viejoM,X_nuevoM,Y_nuevoM),
+     jugada(X_viejoM,Y_viejoM,X_nuevoM,Y_nuevoM));!),!.
 
 
 % jugadaConsecutiva(X,Y) :-
