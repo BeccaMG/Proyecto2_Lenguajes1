@@ -298,6 +298,7 @@ puedeComer(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo) :-
     ),
     not(casillaOcupada(X_nuevo,Y_nuevo)).
 
+    
 %caso en e lque el rey sube al noroeste
 noHayObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     (X_viejo>X_nuevo),
@@ -372,7 +373,98 @@ puedeDesplazarse(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo,2,2):-
 puedeDesplazarse(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo,_,_):-
     noHayObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo),
     obtenerJugador(Jugador),
+    reubicarFicha(Jugador,rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo),!.
+
+%caso en el que si hay al menos un obstaculo, y el movimiento es de N pasos    
+puedeDesplazarse(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo,_,_):-
+    %el rey solo puede comer largo la primera jugada, esto es
+    %en las jugadas consecutivas no podra comer largo
+    not(comio),
+    not(casillaOcupada(X_nuevo,Y_nuevo)),
+    obtenerJugador(Jugador),
+    puedeComer(Jugador,rey,X_viejo,Y_viejo,X_nuevo,Y_nuevo).
+  
+%Se calculan las coordenadas de lprimer obstaculo. (estas no pueden coincidir
+% con las coordenadas de desitno, por lo que forzosamente esta entre el rey
+%y el destino). Se verifica que no haya algun otro obstaculo entre esta ficha
+%y el destino. Solo asi, la comida sera posible.  
+puedeComer(Jugador,rey,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
+    obtenerPrimerObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo,XResult1,YResult2),
+    noHayObstaculo(XResult1,YResult2,X_nuevo,Y_nuevo),
+    obtenerContrincante(Jugador,JugadorContrincante),
+    eliminarFicha(JugadorContrincante,XResult1,YResult2),
+    assert(comio),
     reubicarFicha(Jugador,rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo).
+    
+obtenerPrimerObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo,XResult1,YResult2):-
+    (X_viejo>X_nuevo),
+    (Y_viejo>Y_nuevo),
+    write('noroeste'),
+    primerObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo,XResult1,YResult2,-,-),!.
+
+obtenerPrimerObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo,XResult1,YResult2):-
+    (X_viejo>X_nuevo),
+    (Y_viejo<Y_nuevo),
+    write('noreste'),
+    primerObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo,XResult1,YResult2,-,+),!.
+
+obtenerPrimerObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo,XResult1,YResult2):-
+    (X_viejo<X_nuevo),
+    (Y_viejo<Y_nuevo),
+    write('sureste'),
+    primerObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo,XResult1,YResult2,+,+),!.
+
+obtenerPrimerObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo,XResult1,YResult2):-
+    (X_viejo<X_nuevo),
+    (Y_viejo>Y_nuevo),
+    write('suroeste'),
+    primerObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo,XResult1,YResult2,+,-),!.
+
+primerObstaculo(X,Y,X,Y,_,_,_,_):-fail.
+
+primerObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo,XResult1,YResult2,OpX,OpY):-
+    K =.. [OpX,X_viejo,1],
+    NewX is K,
+    Z =.. [OpY,Y_viejo,1],
+    NewY is Z,
+  %  write(NewX),
+   %S write(NewY),
+    casillaOcupada(NewX,NewY),!,
+    %la casilla siguiente debe coincidir con la casilla a donde se quiere saltar
+    M =.. [OpX,NewX,1],
+    N =.. [OpY,NewY,1],
+    MyLast is M,
+    NyLast is N,
+    (X_nuevo = MyLast),
+    (Y_nuevo = NyLast),
+    (XResult1 = NewX),
+    (YResult2 = NewY).
+
+%gracias al cut ! sabemso que este caso asume not(casillaOcupada)
+primerObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo,XResult1,YResult2,OpX,OpY):-
+    K =.. [OpX,X_viejo,1],
+    NewX is K,
+    Z =.. [OpY,Y_viejo,1],
+    NewY is Z,
+  %  write(NewX),
+   %S write(NewY),
+    primerObstaculo(NewX,NewY,X_nuevo,Y_nuevo,XResult1,YResult2,OpX,OpY).
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
 movimientoValido(jugador1,peon,X_viejo,_,X_nuevo,_):-
