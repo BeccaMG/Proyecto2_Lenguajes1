@@ -37,11 +37,8 @@ jugada(8,5,5,8),
 jugada(6,1,5,2),
 jugada(5,8,3,6),
 jugada(5,2,4,3),
-jugada(1,4,3,2),
-jugada(6,3,4,5),
-jugada(4,5,2,3),
-jugada(1,2,3,4),
-jugada(3,4,5,2).
+jugada(3,4,5,2),
+jugada(5,2,7,4).
 
 comerobligado :-
 jugada(3,8,4,7),
