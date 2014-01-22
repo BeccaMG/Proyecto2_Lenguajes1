@@ -158,9 +158,8 @@ printColumnas(Fila,Columna):-
 % Retorna true si JugadorContrincante es el adversario actual
 % de Jugador
 obtenerContrincante(Jugador,JugadorContrincante):-
-    jugadores(Jugador),
     jugadores(JugadorContrincante),
-    not(JugadorContrincante = Jugador).
+    not(JugadorContrincante=Jugador),!.    
     
 % procedimiento auxiliar de la funcion printTableroActual    
 % for i=1..8 do
@@ -384,14 +383,12 @@ puedeDesplazarse(peon(X_viejo,Y_viejo),X_nuevo,Y_nuevo,2,2):-
     obtenerJugador(Jugador),
     puedeComer(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo),
     obtenerContrincante(Jugador,JugadorContrincante),
-    obtenerIntermedias(X_viejo,Y_viejo,X_nuevo,Y_nuevo,X_intermedia,
-                       Y_intermedia),
+    obtenerIntermedias(X_viejo,Y_viejo,X_nuevo,Y_nuevo,X_intermedia,Y_intermedia),
     eliminarFicha(JugadorContrincante,X_intermedia,Y_intermedia),
     assert(comio),
     reubicarFicha(Jugador,peon(X_viejo,Y_viejo),X_nuevo,Y_nuevo),
     nl.
     
-
 %True si el desplazamiento a computar es de exactamente 2 casillas,
 %siendo ademas un rey quien la efectua, verificando que dicho rey   
 %cumpla con las condiciones impuestas por el predicado puedeComer. 
@@ -399,13 +396,11 @@ puedeDesplazarse(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo,2,2):-
     obtenerJugador(Jugador),
     puedeComer(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo),
     obtenerContrincante(Jugador,JugadorContrincante),
-    obtenerIntermedias(X_viejo,Y_viejo,X_nuevo,Y_nuevo,X_intermedia,
-                       Y_intermedia),
+    obtenerIntermedias(X_viejo,Y_viejo,X_nuevo,Y_nuevo,X_intermedia,Y_intermedia),
     eliminarFicha(JugadorContrincante,X_intermedia,Y_intermedia),
     assert(comio),
     reubicarFicha(Jugador,rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo),
-    nl,!.
-
+    nl,!.     
     
 %True si el desplazamiento a computar es ejecutado por un rey,
 %sin importar la cantidad de pasos que este desee moverse, siempre y cuando
@@ -414,7 +409,7 @@ puedeDesplazarse(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo,_,_):-
     noHayObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo),
     obtenerJugador(Jugador),
     reubicarFicha(Jugador,rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo),!.
-    
+
 
 %True si el desplazamiento a computar es ejecutado por un rey,
 %sin importar la cantidad de pasos que este desee moverse, siempre
@@ -431,7 +426,6 @@ puedeDesplazarse(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo,_,_):-
     eliminarFicha(JugadorContrincante,XResult1,YResult2),
     assert(comio),
     reubicarFicha(Jugador,rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo).
-
   
 %Se calculan las coordenadas del primer obstaculo. (estas no pueden coincidir
 % con las coordenadas de desitno, por lo que forzosamente esta entre el rey
@@ -557,9 +551,7 @@ desplazar(peon(X_viejo,Y_viejo),X_nuevo,Y_nuevo):-
     ModuloDiferenciaY is abs(DiferenciaY),
     %write(ModuloDiferenciaX),
     %write(ModuloDiferenciaY).
-    puedeDesplazarse(peon(X_viejo,Y_viejo),X_nuevo,Y_nuevo,ModuloDiferenciaX,
-                          ModuloDiferenciaY).
-    
+    puedeDesplazarse(peon(X_viejo,Y_viejo),X_nuevo,Y_nuevo,ModuloDiferenciaX,ModuloDiferenciaY).
     
 %True si la solicitud de desplazamiento es efectuada por un rey, siempre y cuando
 %se cumplan con las condiciones impuestas por los predicados movimientoValido
@@ -570,31 +562,25 @@ desplazar(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo):-
     calcularDiferencia(X_viejo,Y_viejo,X_nuevo,Y_nuevo,DiferenciaX,DiferenciaY),
     ModuloDiferenciaX is abs(DiferenciaX),
     ModuloDiferenciaY is abs(DiferenciaY),
-    puedeDesplazarse(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo,ModuloDiferenciaX,
-                     ModuloDiferenciaY).
-                     
-
-
+    puedeDesplazarse(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo,ModuloDiferenciaX,ModuloDiferenciaY).
+    
 %Obtiene una jugada valida para la maquina, basada en aquellos valores
 %dentro del rango del tablero permitido que correspondan a una jugada de
 %procesamiento valido
-obtenerJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
+obtenerJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-    
     member(X_viejo,[1,2,3,4,5,6,7,8]), 
     member(Y_viejo,[1,2,3,4,5,6,7,8]),
     member(X_nuevo,[1,2,3,4,5,6,7,8]), 
     member(Y_nuevo,[1,2,3,4,5,6,7,8]),
     procesarJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo),!.
     
-
 %True si el jugador posee una ficha peon correspondiente a las coordenadas 
 %de origen X_viejo,Y_viejo, siempre y cuando esta cumpla con las condiciones
-%impuestas por el predicado desplazar
+%impuestas por el predicado desplazar    
 procesarJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     obtenerJugador(Jugador),
     tieneFicha(Jugador,peon(X_viejo,Y_viejo)),
     desplazar(peon(X_viejo,Y_viejo),X_nuevo,Y_nuevo).
-    
-
 
 %True si el jugador posee una ficha rey correspondiente a las coordenadas
 %de origen X_viejo,Y_viejo, siempre y cuando esta cumpla con las condiciones
@@ -603,7 +589,6 @@ procesarJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     obtenerJugador(Jugador),
     tieneFicha(Jugador,rey(X_viejo,Y_viejo)),
     desplazar(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo).
-    
 
 %True si las coordenadas de origen y destino son validas, y ademas
 %esta configuracion de movimiento corresponde a una jugadanormal o a 
@@ -627,7 +612,7 @@ jugadaNormal(X_viejo,Y_viejo,X_nuevo,Y_nuevo) :-
        halt); ! ),
     ( (comio, retract(comio), puedeComer(X_nuevo,Y_nuevo,_,_),
         assert(comer(X_nuevo,Y_nuevo)), !);
-      (cambiarTurno, (verificarTranca; !)) ),
+      (cambiarTurno, !) ),
     imprimirTurno,
     %caso en el que el turno es de la maquina, se computa la primera jugada valida
     ( (turnoMaquina,jugadaMaquina);!),!.
@@ -643,7 +628,7 @@ jugadaConsecutiva(X_viejo,Y_viejo,X_nuevo,Y_nuevo) :-
        halt); ! ),
     ( (comio, retract(comio), puedeComer(X_nuevo,Y_nuevo,_,_),
         assert(comer(X_nuevo,Y_nuevo)), !);
-      (cambiarTurno, (verificarTranca; !)) ),
+      (cambiarTurno, !) ),
     imprimirTurno,
     %caso en el que el turno es de la maquina, se computa la primera jugada valida
     ( (turnoMaquina,jugadaMaquina);!),!.
@@ -750,71 +735,3 @@ puedeComer(rey(X,Y),X1,Y1) :-
     puedeComer(Jugador,X,Y,X1,Y1),
     abs(X1-X) =:= 2,
     abs(Y1-Y) =:= 2.
-
-verificarTranca :-
-    obtenerJugador(Jugador),
-    not(tieneJugada(_,_,_,_)),
-    obtenerContrincante(Jugador, JC),
-    write('\n¡Ha ganado '), write(JC), write('!\n\n'), 
-    halt.
-    
-tieneJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo) :-
-    member(X_viejo,[1,2,3,4,5,6,7,8]), 
-    member(Y_viejo,[1,2,3,4,5,6,7,8]),
-    member(X_nuevo,[1,2,3,4,5,6,7,8]), 
-    member(Y_nuevo,[1,2,3,4,5,6,7,8]),
-    procesarJugada2(X_viejo,Y_viejo,X_nuevo,Y_nuevo).
-    
-procesarJugada2(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
-    obtenerJugador(Jugador),
-    tieneFicha(Jugador,peon(X_viejo,Y_viejo)),
-    %procesarPeon(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo),!.
-    desplazar2(peon(X_viejo,Y_viejo),X_nuevo,Y_nuevo).
-    
-procesarJugada2(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
-    obtenerJugador(Jugador),
-    tieneFicha(Jugador,rey(X_viejo,Y_viejo)),
-    %procesarPeon(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo),!.
-    desplazar2(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo).
-    
-desplazar2(peon(X_viejo,Y_viejo),X_nuevo,Y_nuevo) :-
-    obtenerJugador(Jugador),
-    movimientoValido(Jugador,peon,X_viejo,Y_viejo,X_nuevo,Y_nuevo),
-    calcularDiferencia(X_viejo,Y_viejo,X_nuevo,Y_nuevo,DiferenciaX,DiferenciaY),
-    ModuloDiferenciaX is abs(DiferenciaX),
-    ModuloDiferenciaY is abs(DiferenciaY),
-    puedeDesplazarse2(peon(X_viejo,Y_viejo),X_nuevo,Y_nuevo,ModuloDiferenciaX,
-                          ModuloDiferenciaY).
-                          
-desplazar2(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo) :-
-    obtenerJugador(Jugador),
-    movimientoValido(Jugador,rey,X_viejo,Y_viejo,X_nuevo,Y_nuevo),
-    calcularDiferencia(X_viejo,Y_viejo,X_nuevo,Y_nuevo,DiferenciaX,DiferenciaY),
-    ModuloDiferenciaX is abs(DiferenciaX),
-    ModuloDiferenciaY is abs(DiferenciaY),
-    puedeDesplazarse2(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo,ModuloDiferenciaX,
-                     ModuloDiferenciaY).
-                     
-puedeDesplazarse2(peon(_,_),X_nuevo,Y_nuevo,1,1):-
-    not(casillaOcupada(X_nuevo,Y_nuevo)).
-    
-
-puedeDesplazarse2(peon(X_viejo,Y_viejo),X_nuevo,Y_nuevo,2,2):-
-    obtenerJugador(Jugador),
-    puedeComer(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo).
-    
-puedeDesplazarse2(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo,2,2):-
-    obtenerJugador(Jugador),
-    puedeComer(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo).
-    
-
-puedeDesplazarse2(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo,_,_):-
-    noHayObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo).
-    
-puedeDesplazarse2(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo,_,_):-
-    %el rey solo puede comer largo la primera jugada, esto es
-    %en las jugadas consecutivas no podra comer largo
-    not(comio),
-    not(casillaOcupada(X_nuevo,Y_nuevo)),
-    obtenerJugador(Jugador),
-    puedeComer(Jugador,rey,X_viejo,Y_viejo,X_nuevo,Y_nuevo).
