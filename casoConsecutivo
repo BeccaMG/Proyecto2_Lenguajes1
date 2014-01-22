@@ -1,0 +1,24 @@
+casoComidaConsecutivaYADistancia:-
+    reubicarFicha(jugador1,peon(2,1),5,2),
+    reubicarFicha(jugador1,peon(1,2),5,4),
+    reubicarFicha(jugador1,peon(3,6),4,7),
+    reubicarFicha(jugador1,peon(2,3),6,6),
+    eliminarFicha(jugador1,2,7),
+    reubicarFicha(jugador2,peon(6,3),2,7),
+    cambiarPeonPorRey(jugador2,2,7),
+    eliminarFicha(jugador1,3,8),
+    eliminarFicha(jugador2,6,1),
+    eliminarFicha(jugador1,1,8),
+    eliminarFicha(jugador2,8,7).
+    %jugada(4,7,5,8).
+
+%     1       2       3       4       5       6       7       8       
+% 1 |     | |     | |     | |  B  | |     | |  B  | |     | |     |
+% 2 |     | |     | |     | |     | |  B  | |     | |  ** | |     |
+% 3 |     | |  B  | |     | |  B  | |     | |     | |     | |     |
+% 4 |     | |     | |     | |     | |     | |     | |  B  | |     |
+% 5 |     | |  B  | |     | |  B  | |     | |     | |     | |     |
+% 6 |     | |     | |     | |     | |  *  | |  B  | |  *  | |     |
+% 7 |     | |  *  | |     | |  *  | |     | |  *  | |     | |  *  |
+% 8 |  *  | |     | |  *  | |     | |  *  | |     | |     | |     |
+

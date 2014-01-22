@@ -327,11 +327,8 @@ noHayObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     (Y_viejo>Y_nuevo),
     %write('suroeste'),
     caminoLibre(X_viejo,Y_viejo,X_nuevo,Y_nuevo,+,-),!.
-        
-caminoLibre(X,Y,X,Y,_,_):-!. 
-
-%(X,Y,_,_,_,_):-
-%    ( ((X>8);(Y>8);(X<1);(Y<1)) -> fail). 
+    
+caminoLibre(X,Y,X,Y,_,_). 
 
 caminoLibre(X_viejo,Y_viejo,X_nuevo,Y_nuevo,OpX,OpY):-
     K =.. [OpX,X_viejo,1],
@@ -342,7 +339,7 @@ caminoLibre(X_viejo,Y_viejo,X_nuevo,Y_nuevo,OpX,OpY):-
    %S write(NewY),
     not(casillaOcupada(NewX,NewY)),
     caminoLibre(NewX,NewY,X_nuevo,Y_nuevo,OpX,OpY).
-    
+        
 obtenerIntermedias(X_viejo,Y_viejo,X_nuevo,Y_nuevo,X_intermedia,Y_intermedia):-
     X_intermedia is ((X_viejo+X_nuevo)/2),
     Y_intermedia is ((Y_viejo+Y_nuevo)/2).
@@ -383,40 +380,21 @@ puedeDesplazarse(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo,_,_):-
     %el rey solo puede comer largo la primera jugada, esto es
     %en las jugadas consecutivas no podra comer largo
     not(comio),
+    not(casillaOcupada(X_nuevo,Y_nuevo)),
     obtenerJugador(Jugador),
-    puedeComer(Jugador,rey,X_viejo,Y_viejo,X_nuevo,Y_nuevo,XResult1,YResult2),
-    obtenerContrincante(Jugador,JugadorContrincante),
-    eliminarFicha(JugadorContrincante,XResult1,YResult2),
-    assert(comio),
-    reubicarFicha(Jugador,rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo).
+    puedeComer(Jugador,rey,X_viejo,Y_viejo,X_nuevo,Y_nuevo).
   
 %Se calculan las coordenadas de lprimer obstaculo. (estas no pueden coincidir
 % con las coordenadas de desitno, por lo que forzosamente esta entre el rey
 %y el destino). Se verifica que no haya algun otro obstaculo entre esta ficha
 %y el destino. Solo asi, la comida sera posible.  
-puedeComer(Jugador,rey,X_viejo,Y_viejo,X_nuevo,Y_nuevo,XResult1,YResult2):-
-    not(casillaOcupada(X_nuevo,Y_nuevo)),
+puedeComer(Jugador,rey,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     obtenerPrimerObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo,XResult1,YResult2),
+    noHayObstaculo(XResult1,YResult2,X_nuevo,Y_nuevo),
     obtenerContrincante(Jugador,JugadorContrincante),
-    ( (tieneFicha(JugadorContrincante,peon(XResult1,YResult2)));
-      (tieneFicha(JugadorContrincante,rey(XResult1,YResult2)))
-    ),
-    noHayObstaculo(XResult1,YResult2,X_nuevo,Y_nuevo).
-    
-%puede comer a distancia, rey de la maquina    
-puedeComerADistancia(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
-    member(X_viejo,[1,2,3,4,5,6,7,8]), 
-    member(Y_viejo,[1,2,3,4,5,6,7,8]),
-    member(X_nuevo,[1,2,3,4,5,6,7,8]), 
-    member(Y_nuevo,[1,2,3,4,5,6,7,8]),
-    tieneFicha(Jugador,rey(X_viejo,Y_viejo)),
-    puedeComer(Jugador,rey,X_viejo,Y_viejo,X_nuevo,Y_nuevo,_,_),!.
-    
-puedeComerDirecto(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
-    member(X_viejo,[1,2,3,4,5,6,7,8]), 
-    member(Y_viejo,[1,2,3,4,5,6,7,8]),
-    puedeComer(X_viejo,Y_viejo,X_nuevo,Y_nuevo),!.
-    
+    eliminarFicha(JugadorContrincante,XResult1,YResult2),
+    assert(comio),
+    reubicarFicha(Jugador,rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo).
     
 obtenerPrimerObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo,XResult1,YResult2):-
     (X_viejo>X_nuevo),
@@ -537,7 +515,8 @@ turnoMaquina:-
   
 jugadaNormal(X_viejo,Y_viejo,X_nuevo,Y_nuevo) :-
     not(comer(_,_)),
-    procesarJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo),
+    %solo se procesa una jugada efectuada por el jugador1
+    ( (turnoMaquina,!);(procesarJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo),!) ),
     printTableroActual,
     obtenerJugador(Jugador),
     ( (ganador(Jugador), write('\n¡Ha ganado '), write(Jugador), write('!\n\n'),
@@ -547,13 +526,15 @@ jugadaNormal(X_viejo,Y_viejo,X_nuevo,Y_nuevo) :-
       (cambiarTurno, !) ),
     imprimirTurno,
     %caso en el que el turno es de la maquina, se computa la primera jugada valida
-    ( (turnoMaquina,jugadaMaquina);!),!.
+    ( (turnoMaquina,obtenerJugada(X_viejoM,Y_viejoM,X_nuevoM,Y_nuevoM),
+     jugada(X_viejoM,Y_viejoM,X_nuevoM,Y_nuevoM));!),!.
     
 jugadaConsecutiva(X_viejo,Y_viejo,X_nuevo,Y_nuevo) :-
     comer(X_viejo,Y_viejo),
     retract(comer(X_viejo,Y_viejo)),
     puedeComer(X_viejo,Y_viejo,X_nuevo,Y_nuevo),
-    procesarJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo),
+    %solo se procesa una jugada efectuada por el jugador1
+    ( (turnoMaquina,!);(procesarJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo),!) ),
     printTableroActual,
     obtenerJugador(Jugador),
     ( (ganador(Jugador), write('\n¡Ha ganado '), write(Jugador), write('!\n\n'),
@@ -563,47 +544,10 @@ jugadaConsecutiva(X_viejo,Y_viejo,X_nuevo,Y_nuevo) :-
       (cambiarTurno, !) ),
     imprimirTurno,
     %caso en el que el turno es de la maquina, se computa la primera jugada valida
-    ( (turnoMaquina,jugadaMaquina);!),!.
+    ( (turnoMaquina,obtenerJugada(X_viejoM,Y_viejoM,X_nuevoM,Y_nuevoM),
+     jugada(X_viejoM,Y_viejoM,X_nuevoM,Y_nuevoM));!),!.
 
-jugadaMaquina:-
-    jugadaNormalMaquina.
 
-jugadaNormalMaquina:-
-    obtenerJugador(Jugador),
-    %la maquina primero revisa si puede comer.
-    (
-      ((puedeComerDirecto(X_viejo,Y_viejo,X_nuevo,Y_nuevo),
-        procesarJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo)),!);
-      
-       (obtenerJugada(_,_,X_nuevo,Y_nuevo),!) ),
-    
-    
-    printTableroActual,
-    ( (ganador(Jugador), write('\n¡Ha ganado '), write(Jugador), write('!\n\n'),
-       halt); ! ),
-    ( (comio, retract(comio), puedeComer(X_nuevo,Y_nuevo,_,_),
-        assert(comer(X_nuevo,Y_nuevo)), !);
-      (cambiarTurno, !) ),
-    imprimirTurno,
-    ((comer(_,_),jugadaConsecutivaMaquina);!).
-    
-jugadaConsecutivaMaquina:- 
-    %se obtienen los valores de origen de la maquina   X_viejo Y_viejo
-    comer(X_viejo,Y_viejo),
-    retract(comer(X_viejo,Y_viejo)),
-    %se obtienen los valores de destino de la maquina X_nuevo Y_nuevo
-    puedeComer(X_viejo,Y_viejo,X_nuevo,Y_nuevo),
-    %se procesa la jugada con todos los valores calculados
-    procesarJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo),
-    printTableroActual,
-    obtenerJugador(Jugador),
-    ( (ganador(Jugador), write('\n¡Ha ganado '), write(Jugador), write('!\n\n'),
-       halt); ! ),
-    ( (comio, retract(comio), puedeComer(X_nuevo,Y_nuevo,_,_),
-        assert(comer(X_nuevo,Y_nuevo)), !);
-      (cambiarTurno, !) ),
-    imprimirTurno,
-    ((comer(_,_),jugadaConsecutivaMaquina);!).
 % jugadaConsecutiva(X,Y) :-
 %     puedeComer(X,Y,X1,Y1),
 

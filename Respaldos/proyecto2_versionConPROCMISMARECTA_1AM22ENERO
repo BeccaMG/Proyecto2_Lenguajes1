@@ -328,10 +328,7 @@ noHayObstaculo(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
     %write('suroeste'),
     caminoLibre(X_viejo,Y_viejo,X_nuevo,Y_nuevo,+,-),!.
         
-caminoLibre(X,Y,X,Y,_,_):-!. 
-
-%(X,Y,_,_,_,_):-
-%    ( ((X>8);(Y>8);(X<1);(Y<1)) -> fail). 
+caminoLibre(X,Y,X,Y,_,_). 
 
 caminoLibre(X_viejo,Y_viejo,X_nuevo,Y_nuevo,OpX,OpY):-
     K =.. [OpX,X_viejo,1],
@@ -342,6 +339,48 @@ caminoLibre(X_viejo,Y_viejo,X_nuevo,Y_nuevo,OpX,OpY):-
    %S write(NewY),
     not(casillaOcupada(NewX,NewY)),
     caminoLibre(NewX,NewY,X_nuevo,Y_nuevo,OpX,OpY).
+ 
+ 
+%Establece que dos puntos pertenecen a la misma recta diagonal
+mismaRecta(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
+    (X_viejo>X_nuevo),
+    (Y_viejo>Y_nuevo),
+    %write('noroeste'),
+    restoSegmento(X_viejo,Y_viejo,X_nuevo,Y_nuevo,-,-),!.
+ 
+    
+%caso en el que el rey sube al noreste
+mismaRecta(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
+    (X_viejo>X_nuevo),
+    (Y_viejo<Y_nuevo),
+    %write('noreste'),
+    restoSegmento(X_viejo,Y_viejo,X_nuevo,Y_nuevo,-,+),!.
+    
+%caso en el que el rey baja al sureste
+mismaRecta(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
+    (X_viejo<X_nuevo),
+    (Y_viejo<Y_nuevo),
+   % write('sureste'),
+    restoSegmento(X_viejo,Y_viejo,X_nuevo,Y_nuevo,+,+),!.    
+    
+%caso en el que el rey baja al suroeste
+mismaRecta(X_viejo,Y_viejo,X_nuevo,Y_nuevo):-
+    (X_viejo<X_nuevo),
+    (Y_viejo>Y_nuevo),
+    %write('suroeste'),
+    restoSegmento(X_viejo,Y_viejo,X_nuevo,Y_nuevo,+,-),!.
+        
+restoSegmento(X,Y,X,Y,_,_):-!. 
+
+restoSegmento(X,Y,_,_,_,_):-
+    (((X>8);(X<1);(Y>8);(Y<1)) -> fail).
+    
+restoSegmento(X_viejo,Y_viejo,X_nuevo,Y_nuevo,OpX,OpY):-
+    K =.. [OpX,X_viejo,1],
+    NewX is K,
+    Z =.. [OpY,Y_viejo,1],
+    NewY is Z,
+    restoSegmento(NewX,NewY,X_nuevo,Y_nuevo,OpX,OpY).
     
 obtenerIntermedias(X_viejo,Y_viejo,X_nuevo,Y_nuevo,X_intermedia,Y_intermedia):-
     X_intermedia is ((X_viejo+X_nuevo)/2),
@@ -570,8 +609,10 @@ jugadaMaquina:-
 
 jugadaNormalMaquina:-
     obtenerJugador(Jugador),
-    %la maquina primero revisa si puede comer.
-    (
+    %la maquina primero revisa si puede comer, bien a distancia con un rey
+    %o directamente con rey o peon, con prioridad en el rey.
+    ( ((puedeComerADistancia(Jugador,X_viejo,Y_viejo,X_nuevo,Y_nuevo),
+        procesarJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo)),!);
       ((puedeComerDirecto(X_viejo,Y_viejo,X_nuevo,Y_nuevo),
         procesarJugada(X_viejo,Y_viejo,X_nuevo,Y_nuevo)),!);
       
