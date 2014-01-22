@@ -817,4 +817,4 @@ puedeDesplazarse2(rey(X_viejo,Y_viejo),X_nuevo,Y_nuevo,_,_):-
     not(comio),
     not(casillaOcupada(X_nuevo,Y_nuevo)),
     obtenerJugador(Jugador),
-    puedeComer(Jugador,rey,X_viejo,Y_viejo,X_nuevo,Y_nuevo).
+    puedeComer(Jugador,rey,X_viejo,Y_viejo,X_nuevo,Y_nuevo,_,_).
